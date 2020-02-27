@@ -1,11 +1,9 @@
 package lib
 
 import (
-	"bufio"
 	"crypto/md5"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -67,34 +65,40 @@ func GetBin(wfile string,url string){
 const bufferSize = 65536
 
 // MD5sum returns MD5 checksum of one filename
-func MD5sum(filename string) (string, error) {
-	if info, err := os.Stat(filename); err != nil {
-		return "", err
-	} else if info.IsDir() {
-		return "", nil
-	}
-
-	file, err := os.Open(filename)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
+func MD5sum(file string) (string) {
+	//if info, err := os.Stat(filename); err != nil {
+	//	return "", err
+	//} else if info.IsDir() {
+	//	return "", nil
+	//}
+	//
+	//file, err := os.Open(filename)
+	//if err != nil {
+	//	return "", err
+	//}
+	//defer file.Close()
 
 	hash := md5.New()
-	for buf, reader := make([]byte, bufferSize), bufio.NewReader(file); ; {
-		n, err := reader.Read(buf)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return "", err
-		}
-
-		hash.Write(buf[:n])
-	}
+	bfile:=[]byte(file)
+	hash.Write(bfile)
 
 	checksum := fmt.Sprintf("%x", hash.Sum(nil))
-	return checksum, nil
+	return checksum
+
+	//for buf, reader := make([]byte, bufferSize), bufio.NewReader(file); ; {
+	//	n, err := reader.Read(buf)
+	//	if err != nil {
+	//		if err == io.EOF {
+	//			break
+	//		}
+	//		return "", err
+	//	}
+	//
+	//	hash.Write(buf[:n])
+	//}
+	//
+	//checksum := fmt.Sprintf("%x", hash.Sum(nil))
+	//return checksum, nil
 }
 
 func CreateMd5(filename string, md5str *string) {
@@ -113,15 +117,24 @@ func CreateMd5(filename string, md5str *string) {
 		return
 	}
 
+	//*md5str=md5hash.Sum(nil)
 	md5hash.Sum(nil)
 	*md5str = fmt.Sprintf("%x", md5hash.Sum(nil))
+
+	//InfoHander("this md5 create: \n"+string(*md5str))
+	//fmt.Println("this md5 create: \n"+string(*md5str))
 
 }
 
 // MD5sum returns MD5 checksum of many files
 func GetFileName(dir string) (string, error) {
 	var md5str string
+	//var md5str []byte
+
 	//获取指定文件下的所有文件
+	//var md5total []string
+	var strmd5 string
+
 	err := filepath.Walk(dir,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -131,18 +144,31 @@ func GetFileName(dir string) (string, error) {
 			if info.IsDir() == false {
 				//调用上面CreateMd5函数，为每个文件创建MD5，这里的path就是给定目录下的文件的绝对路径
 				CreateMd5(path, &md5str)
+				//md5total=append(md5total, md5str)
+				strmd5=strmd5+md5str
 				//把MD5sr存入redis
 				//_, err = redisClient.Do("HSET", "XzWxClientMd5Sign", path, md5str)
 				if err != nil {
-					log.Println("Set key err: ", err)
+					//log.Println("Set key err: ", err)
+					LogHander("Set key err: ", err)
 				}
 			}
 			return nil
 		})
 	if err != nil {
-		log.Println(err)
-
+		//log.Println(err)
+		LogHander("get dir err!",err)
 	}
-	return md5str, nil
+
+	//MD5 after sorting
+	return MD5sum(strmd5),nil
+	//sort.Strings(md5total)
+	//for md5s := range md5total{
+	//	strmd5=strmd5+string(md5s)
+	//	InfoHander("this md5 sort: \n"+string(md5s))
+	//	fmt.Println("this md5 sort: \n"+string(md5s))
+	//}
+	////MD5sum(strmd5)
+	//return MD5sum(strmd5),nil
 
 }

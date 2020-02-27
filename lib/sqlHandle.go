@@ -144,21 +144,46 @@ func QueryMulti(DB *sql.DB) {
 	}
 }
 
-//更新数据
-func UpdateData(DB *sql.DB){
-	result,err := DB.Exec("UPDATE users set password=? where id=?","111111",1)
-	if err != nil{
-		fmt.Printf("Insert failed,err:%v\n", err)
-		return
-	}
-	fmt.Println("update data successd:", result)
+//更新数据  waiting get attack table.
+func UpdateData(DB *sql.DB,who string) (int64){
+	//result,err := DB.Exec("UPDATE xx set password=? where id=?","111111",1)
+	//rowsaffected:=0
+	esql:=""
+	if who =="file" {
+		esql="UPDATE crack set number=number+1 where ackname=?"
+		result,err := DB.Exec(esql,who)
+		if err != nil{
+			fmt.Printf("Insert failed,err:%v\n", err)
+			return -1
+		}
+		fmt.Println("update data successd:", result)
 
-	rowsaffected,err := result.RowsAffected()
-	if err != nil {
-		fmt.Printf("Get RowsAffected failed,err:%v\n",err)
-		return
+		rowsaffected,err := result.RowsAffected()
+		if err != nil {
+			fmt.Printf("Get RowsAffected failed,err:%v\n",err)
+			return -1
+		}
+		fmt.Println("Affected rows:", rowsaffected)
+		return rowsaffected
 	}
-	fmt.Println("Affected rows:", rowsaffected)
+	if who == "sql"{
+		esql="UPDATE crack set number=number+1 where ackname=?"
+		result,err := DB.Exec(esql,who)
+		if err != nil{
+			fmt.Printf("Insert failed,err:%v\n", err)
+			return -1
+		}
+		fmt.Println("update data successd:", result)
+
+		rowsaffected,err := result.RowsAffected()
+		if err != nil {
+			fmt.Printf("Get RowsAffected failed,err:%v\n",err)
+			return -1
+		}
+		fmt.Println("Affected rows:", rowsaffected)
+		return rowsaffected
+	}
+	return -1
 }
 
 //删除数据

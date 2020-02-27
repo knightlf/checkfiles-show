@@ -10,7 +10,7 @@ import (
 
 const tbSource = "crshow1"
 const tbDist = "crshow"
-const fmd="28cf7f56356350f48559ad848635c7e5"
+const fmd="cd20059c676a1f35d4a34f897b736430"
 
 const dirSource="./source"
 const dirDist="./destin"
@@ -46,10 +46,21 @@ func rsql(){
 		lib.LogHander("connection to mysql failed:", err)
 		return
 	}
+	defer DB.Close()
 
 	srows:=lib.CompareTables(DB,tbSource,tbDist)
 	fmt.Println(".........................db compare finished! is "+ string(srows))
 	if srows !=0{
+		//update attack number
+		upAttack:=lib.UpdateData(DB,"sql")
+		if upAttack==-1{
+			lib.InfoHander("update attack number err! is -1")
+			fmt.Println(".........................update attack number err!!")
+		}
+		lib.InfoHander("update attack number +1! is "+string(upAttack))
+		fmt.Println(".........................update attack number +1! is "+string(upAttack))
+
+		//restore the table data
 		resTable:=lib.RestoreData(DB,tbSource,tbDist)
 		fmt.Println(".........................db restore finished! is "+string(resTable))
 	}
@@ -73,6 +84,25 @@ func rfiles(){
 	if sourcemd5==destinmd5{
 		lib.InfoHander("the file md5 exec has equal. ")
 	}else{
+		//update attack number
+		conn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s",USERNAME, PASSWORD, NETWORK, SERVER, PORT, DATABASE)
+		DB, err := sql.Open("mysql", conn)
+		if err != nil {
+			fmt.Println("connection to mysql failed:", err)
+			lib.LogHander("connection to mysql failed:", err)
+			return
+		}
+
+		upAttack:=lib.UpdateData(DB,"file")
+		if upAttack==-1{
+			lib.InfoHander("update attack number err! is -1")
+			fmt.Println(".........................update attack number err!!")
+		}
+		lib.InfoHander("update attack file number +1! is "+string(upAttack))
+		fmt.Println(".........................update attack number +1! is "+string(upAttack))
+		defer DB.Close()
+
+		//exec restrofile to destetion
 		cpStr:=lib.CmdBash("cp -av "+dirSource+"/* "+dirDist)
 		lib.InfoHander("exec cp: "+cpStr)
 		//fmt.Println(err.Error())
@@ -90,13 +120,16 @@ func rfiles(){
 
 func showmd5(){
 	sourcemd5,err := lib.GetFileName("./source")
+	destmd5,err := lib.GetFileName("./destin")
 	if err !=nil {
 		//fmt.Println(err.Error())
 		lib.InfoHander("exec faild: show md5 error ")
 		fmt.Println(".........................show files md5 exception.")
 	}
-	fmt.Println(".........................show files md5 finished.")
+	fmt.Println(".........................show source files md5: ")
 	fmt.Println(sourcemd5)
+	fmt.Println(".........................show destetion files md5: ")
+	fmt.Println(destmd5)
 
 }
 
