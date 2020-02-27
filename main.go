@@ -1,15 +1,20 @@
 package main
 
 import (
-	"checkfiles-show/lib"
+	"cf-show/lib"
 	"database/sql"
 	"fmt"
 	"os"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-//const table1 = "crshow"
-//const table2 = "crshow1"
+const tbSource = "crshow1"
+const tbDist = "crshow"
+const fmd="28cf7f56356350f48559ad848635c7e5"
+
+const dirSource="./source"
+const dirDist="./destin"
+
 const (
 	USERNAME = "8lab"
 	PASSWORD = "8lab"
@@ -19,6 +24,7 @@ const (
 	DATABASE = "redmine"
 )
 
+var DB *sql.DB
 
 //help print
 func helper() {
@@ -31,6 +37,8 @@ func helper() {
 }
 
 func rsql(){
+	//tb1:="crshow"
+	//tb2:="crshow1"
 	conn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s",USERNAME, PASSWORD, NETWORK, SERVER, PORT, DATABASE)
 	DB, err := sql.Open("mysql", conn)
 	if err != nil {
@@ -39,13 +47,45 @@ func rsql(){
 		return
 	}
 
-	lib.QueryOne(DB)
-	fmt.Println(".........................db queryone finished! ")
+	srows:=lib.CompareTables(DB,tbSource,tbDist)
+	fmt.Println(".........................db compare finished! is "+ string(srows))
+	if srows !=0{
+		resTable:=lib.RestoreData(DB,tbSource,tbDist)
+		fmt.Println(".........................db restore finished! is "+string(resTable))
+	}
 
 }
 
 func rfiles(){
-
+	sourcemd5,serr := lib.GetFileName(dirSource)
+	if serr !=nil {
+		//fmt.Println(err.Error())
+		//lib.InfoHander("exec faild: get dirSource md5 error ")
+		lib.LogHander("exec faild: get dirSource md5 error ",serr)
+		fmt.Println(".........................get dirSource md5 exception.")
+	}
+	destinmd5,derr := lib.GetFileName(dirDist)
+	if derr !=nil {
+		//fmt.Println(err.Error())
+		lib.LogHander("exec faild: get dirDist md5 error ",derr)
+		fmt.Println(".........................get dirDist md5 exception.")
+	}
+	if sourcemd5==destinmd5{
+		lib.InfoHander("the file md5 exec has equal. ")
+	}else{
+		cpStr:=lib.CmdBash("cp -av "+dirSource+"/* "+dirDist)
+		lib.InfoHander("exec cp: "+cpStr)
+		//fmt.Println(err.Error())
+		destinmd5,derr := lib.GetFileName(dirDist)
+		if derr !=nil {
+			//fmt.Println(err.Error())
+			lib.LogHander("exec faild: get dirDist md5 error ",derr)
+			fmt.Println(".........................get dirDist md5 exception.")
+		}
+		lib.LogHander("exec faild: get dirDist md5 error ",derr)
+		fmt.Println("dirDist: "+fmd+"=="+"dirDist: "+destinmd5)
+	}
+	fmt.Println("dirDist: "+fmd+"=="+"dirDist: "+destinmd5)
 }
 
 func showmd5(){
@@ -60,39 +100,10 @@ func showmd5(){
 
 }
 
-var DB *sql.DB
-
-func showsql(){
-	tb1:="crshow"
-	tb2:="crshow"
-	conn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s",USERNAME, PASSWORD, NETWORK, SERVER, PORT, DATABASE)
-	DB, err := sql.Open("mysql", conn)
-	if err != nil {
-		fmt.Println("connection to mysql failed:", err)
-		lib.LogHander("connection to mysql failed:", err)
-		return
-	}
-	defer DB.Close()
-
-	//srows := lib.CompareData(DB,table1,table2)
-	//srows := lib.CompareTables(DB,table1,table2)
-	srows := lib.CompareTables(DB,tb1,tb2)
-	//srows := CompareTables(DB,table1,table2)
-	//fmt.Println(srows)
-	if srows ==-1 {
-		//fmt.Println(err.Error())
-		lib.InfoHander("db table have not edit! ")
-		fmt.Println(".........................db table have not affected rows.")
-
-	}
-	fmt.Println(".........................db table have edit: ")
-	fmt.Println(srows)
-
-}
 
 func showssql(){
 	tb1:="crshow"
-	tb2:="crshow"
+	tb2:="crshow1"
 	conn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s",USERNAME, PASSWORD, NETWORK, SERVER, PORT, DATABASE)
 	DB, err := sql.Open("mysql", conn)
 	if err != nil {
@@ -103,68 +114,23 @@ func showssql(){
 	defer DB.Close()
 
 	//srows := lib.CompareData(DB,table1,table2)
-	//srows := lib.CompareTables(DB,table1,table2)
-	srows := lib.TableOne(DB,tb1,tb2)
+	srows := lib.CompareTables(DB,tb1,tb2)
+	//lib.TableOne(DB,tb1)
+
+	//lib.QueryOne(DB)
 	//srows := CompareTables(DB,table1,table2)
 	//fmt.Println(srows)
-	if srows ==-1 {
+	//if srows ==-1 {
 		//fmt.Println(err.Error())
-		lib.InfoHander("mysql operate exciption! ")
-		fmt.Println(".........................db table have excption.")
+	//	lib.InfoHander("mysql operate exciption! ")
+	//	fmt.Println(".........................db table have excption.")
 
-	}
+	//}
 	fmt.Println(".........................db table have edit: ")
 	fmt.Println(srows)
 
 }
-////crshow 表结构体定义
-//type Crshow struct {
-//	Showstring string `json:"showstring" form:"showstring"`
-//	Ca string `json:"ca" form:"ca"`
-//	Status int   `json:"status" form:"status"`
-//	Createtime int `json:"createtime" form:"createtime"`
-//}
-//
-//func CompareTables(DB *sql.DB, tb1 string,tb2 string) (int) {
-//	cs:=new(Crshow)
-//	//querysql:="SELECT * FROM " +
-//	//	"(SELECT *  FROM ? UNION ALL SELECT * FROM ?) tbl " +
-//	//	"GROUP BY showstring,`status`, ca,`createtime` " +
-//	//	"HAVING COUNT(*) = 1"
-//	querysql:=`SELECT * FROM
-//		(SELECT *  FROM ? UNION ALL SELECT * FROM ?) tbl
-//		GROUP BY showstring,status,ca,createtime
-//		HAVING COUNT(*) = 1`
-//
-//	rows,err:=DB.Query(querysql,tb1,tb2)
-//	defer  DB.Close()
-//
-//	//stmt,_:=DB.Prepare(querysql)
-//	//defer  stmt.Close()
-//	//rows,err:=stmt.Query(tb1,tb2)
-//
-//	if err != nil{
-//		//fmt.Printf("Get RowsAffected failed,err:%v\n",err)
-//		lib.LogHander("exec sql failed,err:%v\n",err)
-//		//return -1
-//	}
-//
-//	count:=0
-//	for rows.Next(){
-//		err = rows.Scan(&cs.Showstring, &cs.Ca, &cs.Status, &cs.Createtime)  //不scan会导致连接不释放
-//		if err != nil {
-//			//fmt.Printf("Scan failed,err:%v\n", err)
-//			lib.LogHander("Scan failed,err:%v\n",err)
-//			return -1
-//		}
-//		count+=1
-//		//fmt.Println("scan successd:", *user)
-//	}
-//	//rows,_:=stmt.Query(tb1,tb2)
-//	rows.Close()
-//	return count
-//
-//}
+
 
 func main(){
 	if len(os.Args)!=2{

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"upgrader/lib"
 )
 
 //数据库连接信息
@@ -99,6 +100,24 @@ func QueryOne(DB *sql.DB) {
 		return
 	}
 	fmt.Println("Single row data:", *cs)
+}
+
+//查询单行 , tb1 string,tb2 string   (int)
+func TableOne(DB *sql.DB, tb1 string) {
+	//querysql:=`SELECT * FROM (SELECT *  FROM ? UNION ALL SELECT * FROM ?) tbl GROUP BY showstring,STATUS,ca,createtime HAVING COUNT(*) = 1  LIMIT 1`
+	querysql:="SELECT * FROM "+tb1+" limit 1"
+
+	cs := new(Crshow)   //用new()函数初始化一个结构体对象
+	//row := DB.QueryRow("SELECT * FROM crshow where ca=? ", tb1)
+	//row := DB.QueryRow("SELECT * FROM ? limit 1 ", tb1)
+	row := DB.QueryRow(querysql)
+	//row.scan中的字段必须是按照数据库存入字段的顺序，否则报错
+	if err := row.Scan(&cs.Showstring,&cs.Ca,&cs.Status,&cs.Createtime); err != nil {
+		fmt.Printf("scan failed, err:%v\n", err)
+		//return -1
+	}
+	fmt.Println("Single row data:", *cs)
+	//return 1
 }
 
 //查询多行
@@ -199,14 +218,14 @@ func CompareTables(DB *sql.DB, tb1 string,tb2 string) (int) {
 	//	"GROUP BY showstring,`status`, ca,`createtime` " +
 	//	"HAVING COUNT(*) = 1"
 	querysql:=`SELECT * FROM
-		(SELECT *  FROM ? UNION ALL SELECT * FROM ?) tbl
+		(SELECT *  FROM ` +tb1+` UNION ALL SELECT * FROM `+tb2+ `) tbl
 		GROUP BY showstring,status,ca,createtime
 		HAVING COUNT(*) = 1`
 	InfoHander(querysql)
 	//querysql := "SELECT *  FROM ?"
 
-	rows,err:=DB.Query(querysql,tb1,tb2)
-	//rows,err:=DB.Query(querysql,tb1)
+	//rows,err:=DB.Query(querysql,tb1,tb2)
+	rows,err:=DB.Query(querysql)
 
 	//stmt,_:=DB.Prepare(querysql)
 	//defer  stmt.Close()
@@ -215,7 +234,7 @@ func CompareTables(DB *sql.DB, tb1 string,tb2 string) (int) {
 	if err != nil{
 		//fmt.Printf("Get RowsAffected failed,err:%v\n",err)
 		LogHander("exec sql failed,err:%v\n",err)
-		//return -1
+		return -1
 	}
 
 	//defer rows.Close()
@@ -229,44 +248,39 @@ func CompareTables(DB *sql.DB, tb1 string,tb2 string) (int) {
 		}
 		count+=1
 	}
-	//rows,_:=stmt.Query(tb1,tb2)
-
-
 
 	defer func() {
 		if rows != nil {
 			rows.Close()   //关闭掉未scan的sql连接
 		}
 	}()
-	//if err != nil {
-	//	fmt.Printf("Query failed,err:%v\n", err)
-	//	return -1
-	//}
-	//for rows.Next() {
-	//	err = rows.Scan(&user.Id, &user.Username, &user.Password)  //不scan会导致连接不释放
-	//	if err != nil {
-	//		fmt.Printf("Scan failed,err:%v\n", err)
-	//		return -1
-	//	}
-	//	fmt.Println("scan successd:", *user)
-	//}
-
 
 	return count
 
 }
 
-//查询单行
-func TableOne(DB *sql.DB, tb1 string,tb2 string)  (int) {
-	querysql:=`SELECT * FROM (SELECT *  FROM ? UNION ALL SELECT * FROM ?) tbl GROUP BY showstring,STATUS,ca,createtime HAVING COUNT(*) = 1  LIMIT 1`
-	cs := new(Crshow)   //用new()函数初始化一个结构体对象
-	//row := DB.QueryRow("SELECT * FROM crshow where ca=? ", "cc")
-	row := DB.QueryRow(querysql,tb1,tb2)
-	//row.scan中的字段必须是按照数据库存入字段的顺序，否则报错
-	if err := row.Scan(&cs.Showstring,&cs.Ca,&cs.Status,&cs.Createtime); err != nil {
-		fmt.Printf("scan failed, err:%v\n", err)
-		//return -1
+
+//恢复数据 TRUNCATE TABLE crshow 
+//INSERT INTO crshow SELECT * FROM crshow1;
+func RestoreData(DB *sql.DB,tbsource string,tbdist string) (int){
+	cleansql:="TRUNCATE TABLE "+tbdist
+	writesql:="INSERT INTO "+tbdist+" SELECT * FROM "+tbsource+";"
+
+	_,cerr := DB.Exec(cleansql)
+	if cerr != nil{
+		//fmt.Printf("Clean table crshow failed,err:%v\n", err)
+		lib.LogHander("Clean table crshow failed,err:%v\n",cerr)
+		return -1
 	}
-	fmt.Println("Single row data:", *cs)
+	_,werr := DB.Exec(writesql)
+	if werr != nil{
+		//fmt.Printf("Insert failed,err:%v\n", err)
+		lib.LogHander("Insert table crshow failed,err:%v\n",werr)
+		return -1
+	}
+	fmt.Println("update data successd:")
+	lib.InfoHander("Restore data table crshow successd!")
 	return 1
+
 }
+
