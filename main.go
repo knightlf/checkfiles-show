@@ -206,8 +206,10 @@ func rfiles(){
 }
 
 func showmd5(){
-	sourcemd5,err := lib.GetFileName("./source")
-	destmd5,err := lib.GetFileName("./destin")
+	//sourcemd5,err := lib.GetFileName("./source")
+	//destmd5,err := lib.GetFileName("./destin")
+	sourcemd5,err := lib.GetFileName(dirSource)
+	destmd5,err := lib.GetFileName(dirDist)
 	if err !=nil {
 		//fmt.Println(err.Error())
 		lib.InfoHander("exec faild: show md5 error ")
