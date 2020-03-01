@@ -132,11 +132,12 @@ func rfiles(){
 		lib.LogHander("exec faild: get dirDist md5 error ",derr)
 		fmt.Println(".........................get dirDist md5 exception.")
 	}
-	if sourcemd5==destinmd5{
+	//if sourcemd5==destinmd5{
+	if string(sourcemd5)==string(destinmd5) {
 		lib.InfoHander("the file md5 exec has equal. ")
-	}else{
+	} else {
 		//update attack number
-		conn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s",USERNAME, PASSWORD, NETWORK, SERVER, PORT, DATABASE)
+		conn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s", USERNAME, PASSWORD, NETWORK, SERVER, PORT, DATABASE)
 		DB, err := sql.Open("mysql", conn)
 		if err != nil {
 			fmt.Println("connection to mysql failed:", err)
@@ -145,62 +146,59 @@ func rfiles(){
 		}
 
 		//update attack number attack_name: file=node_attack  sql=data_tampering
-		upAttack:=lib.UpdateData(DB,"node_attack")
-		if upAttack==-1{
+		upAttack := lib.UpdateData(DB, "node_attack")
+		if upAttack == -1 {
 			lib.InfoHander("update attack number err! is -1")
 			fmt.Println(".........................update attack number err!!")
 		}
-		lib.InfoHander("update attack file number +1! is "+string(upAttack))
-		fmt.Println(".........................update attack number +1! is "+string(upAttack))
+		lib.InfoHander("update attack file number +1! is " + string(upAttack))
+		fmt.Println(".........................update attack number +1! is " + string(upAttack))
 		defer DB.Close()
 
 		//update node_info
 		//return 1 is sucessful.
-		upNodeInfo:=lib.UpdateInfo(DB)
-		if upNodeInfo!=1{
+		upNodeInfo := lib.UpdateInfo(DB)
+		if upNodeInfo != 1 {
 			lib.InfoHander("update node_info number err! is -1")
 			fmt.Println(".........................update node_info err!!")
 		}
-		lib.InfoHander("update node_info +1! is "+string(upNodeInfo))
-		fmt.Println(".........................update node_info +1! is "+string(upNodeInfo))
-
+		lib.InfoHander("update node_info +1! is " + string(upNodeInfo))
+		fmt.Println(".........................update node_info +1! is " + string(upNodeInfo))
 
 		//add attack_info
 		//at_type is 2 or 3 , attack_name: 2 = node_attack;  3 = data_tampering
 		//return 1 is sucessful.
-		addInfo:=lib.InsertInfo(DB,"hacker",2)
-		if addInfo==-1{
+		addInfo := lib.InsertInfo(DB, "hacker", 2)
+		if addInfo == -1 {
 			lib.InfoHander("add attack_info err! is -1")
 			fmt.Println(".........................add attack_info err!!")
 		}
-		lib.InfoHander("add attack_info is "+string(addInfo))
-		fmt.Println(".........................add attack_info is "+string(addInfo))
-
+		lib.InfoHander("add attack_info is " + string(addInfo))
+		fmt.Println(".........................add attack_info is " + string(addInfo))
 
 		//add attack_log
 		//at_type is 2 or 3 , attack_name: 2 = node_attack;  3 = data_tampering
 		//return 1 is sucessful.
-		addLog:=lib.InsertLog(DB,2)
-		if addLog==-1{
+		addLog := lib.InsertLog(DB, 2)
+		if addLog == -1 {
 			lib.InfoHander("add attack_log is err!")
 			fmt.Println(".........................add attack_log is err!")
 		}
-		lib.InfoHander("add attack_info is "+string(addLog))
-		fmt.Println(".........................add attack_info is "+string(addLog))
-
+		lib.InfoHander("add attack_info is " + string(addLog))
+		fmt.Println(".........................add attack_info is " + string(addLog))
 
 		//exec restrofile to destetion
-		cpStr:=lib.CmdBash("cp -av "+dirSource+"/* "+dirDist)
-		lib.InfoHander("exec cp: "+cpStr)
+		cpStr := lib.CmdBash("cp -av " + dirSource + "/* " + dirDist)
+		lib.InfoHander("exec cp: " + cpStr)
 		//fmt.Println(err.Error())
-		destinmd5,derr := lib.GetFileName(dirDist)
-		if derr !=nil {
+		destinmd5, derr := lib.GetFileName(dirDist)
+		if derr != nil {
 			//fmt.Println(err.Error())
-			lib.LogHander("exec faild: get dirDist md5 error ",derr)
+			lib.LogHander("exec faild: get dirDist md5 error ", derr)
 			fmt.Println(".........................get dirDist md5 exception.")
 		}
-		lib.LogHander("exec faild: get dirDist md5 error ",derr)
-		fmt.Println("dirDist: "+fmd+"=="+"dirDist: "+destinmd5)
+		lib.LogHander("exec faild: get dirDist md5 error ", derr)
+		fmt.Println("dirDist: " + fmd + "==" + "dirDist: " + destinmd5)
 	}
 	fmt.Println("dirDist: "+fmd+"=="+"dirDist: "+destinmd5)
 }
