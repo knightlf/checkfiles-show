@@ -68,26 +68,105 @@ func CreateTable(DB *sql.DB) {
 	fmt.Println("create table successd")
 }
 
-//插入数据
-func InsertData(DB *sql.DB) {
-	result,err := DB.Exec("insert INTO users(username,password) values(?,?)","test","123456")
-	if err != nil{
-		fmt.Printf("Insert data failed,err:%v", err)
-		return
-	}
-	lastInsertID,err := result.LastInsertId()    //获取插入数据的自增ID
-	if err != nil {
-		fmt.Printf("Get insert id failed,err:%v", err)
-		return
-	}
-	fmt.Println("Insert data id:", lastInsertID)
+//插入数据 attack_info,
+// at_type is 2 or 3 , attack_name: 2 = node_attack;  3 = data_tampering
+func InsertInfo(DB *sql.DB,defender string,at_type int) int64 {
+	//INSERT INTO `attack_defense_info`.`attack_info` (`defender`,`status`,`attack_type`,`createtime`) VALUES ('defender', 0, 2, NOW());
+	//result,err := DB.Exec("INSERT INTO `attack_info`(`defender`,`status`,`attack_type`,`createtime`) VALUES ('defender', 0, 2, NOW()) ;","test","123456")
+	sql:="INSERT INTO `attack_info`(`defender`,`status`,`attack_type`,`createtime`) VALUES (?, 0, ?, NOW())"
+	if at_type ==2 {
+		//esql="UPDATE all_attack SET 'count'='count'+1 WHERE attack_name=?"
+		result,err := DB.Exec(sql,defender,at_type)
+		if err != nil{
+			//fmt.Printf("Insert attack_info failed,err:%v\n", err)
+			LogHander("Insert attack_info failed,err:%v\n", err)
+			return -1
+		}
+		//fmt.Println("Insert attack_info successd:", result)
+		InfoHander("Insert attack_info successd.")
 
-	rowsaffected,err := result.RowsAffected()  //通过RowsAffected获取受影响的行数
-	if err != nil {
-		fmt.Printf("Get RowsAffected failed,err:%v",err)
-		return
+		rowsaffected,err := result.RowsAffected()
+		if err != nil {
+			//fmt.Printf("Get Insert attack_info RowsAffected failed,err:%v\n",err)
+			LogHander("Get Insert attack_info RowsAffected failed,err:%v\n",err)
+			return -1
+		}
+		//fmt.Println("Affected rows:", rowsaffected)
+		InfoHander("Affected rows: "+string(rowsaffected))
+		return rowsaffected
 	}
-	fmt.Println("Affected rows:", rowsaffected)
+	if at_type ==3 {
+		//esql="UPDATE all_attack SET 'count'='count'+1 WHERE attack_name=?"
+		result,err := DB.Exec(sql,defender,at_type)
+		if err != nil{
+			//fmt.Printf("Insert attack_info failed,err:%v\n", err)
+			LogHander("Insert attack_info failed,err:%v\n", err)
+			return -1
+		}
+		//fmt.Println("Insert attack_info successd:", result)
+		InfoHander("Insert attack_info successd.")
+
+		rowsaffected,err := result.RowsAffected()
+		if err != nil {
+			//fmt.Printf("Get Insert attack_info RowsAffected failed,err:%v\n",err)
+			LogHander("Get Insert attack_info RowsAffected failed,err:%v\n",err)
+			return -1
+		}
+		//fmt.Println("Affected rows:", rowsaffected)
+		InfoHander("Affected rows: "+string(rowsaffected))
+		return rowsaffected
+	}
+	return -1
+}
+
+//插入数据 attack_log
+func InsertLog(DB *sql.DB,at_type int) int64 {
+	//INSERT INTO `attack_defense_info`.`attack_log` (`attack_type`, `attack_node`,`node_ip`,`create_time`,`is_block`,`is_alarm`) VALUES(2,'attack_node','node_ip',NOW(),1,1) ;
+	//result,err := DB.Exec("insert INTO users(username,password) values(?,?)","test","123456")
+	sql:="INSERT INTO `attack_log`(`attack_type`, `attack_node`,`node_ip`,`create_time`,`is_block`,`is_alarm`) VALUES(?,'崇仁','192.168.1.3',NOW(),1,1)"
+	if at_type ==2 {
+		//esql="UPDATE all_attack SET 'count'='count'+1 WHERE attack_name=?"
+		result,err := DB.Exec(sql,at_type)
+		if err != nil{
+			//fmt.Printf("Insert attack_info failed,err:%v\n", err)
+			LogHander("Insert attack_info failed,err:%v\n", err)
+			return -1
+		}
+		//fmt.Println("Insert attack_info successd:", result)
+		InfoHander("Insert attack_info successd.")
+
+		rowsaffected,err := result.RowsAffected()
+		if err != nil {
+			//fmt.Printf("Get Insert attack_info RowsAffected failed,err:%v\n",err)
+			LogHander("Get Insert attack_info RowsAffected failed,err:%v\n",err)
+			return -1
+		}
+		//fmt.Println("Affected rows:", rowsaffected)
+		InfoHander("Affected rows: "+string(rowsaffected))
+		return rowsaffected
+	}
+	if at_type ==3 {
+		//esql="UPDATE all_attack SET 'count'='count'+1 WHERE attack_name=?"
+		result,err := DB.Exec(sql,at_type)
+		if err != nil{
+			//fmt.Printf("Insert attack_info failed,err:%v\n", err)
+			LogHander("Insert attack_info failed,err:%v\n", err)
+			return -1
+		}
+		//fmt.Println("Insert attack_info successd:", result)
+		InfoHander("Insert attack_info successd.")
+
+		rowsaffected,err := result.RowsAffected()
+		if err != nil {
+			//fmt.Printf("Get Insert attack_info RowsAffected failed,err:%v\n",err)
+			LogHander("Get Insert attack_info RowsAffected failed,err:%v\n",err)
+			return -1
+		}
+		//fmt.Println("Affected rows:", rowsaffected)
+		InfoHander("Affected rows: "+string(rowsaffected))
+		return rowsaffected
+	}
+	return -1
 }
 
 //查询单行
@@ -144,46 +223,90 @@ func QueryMulti(DB *sql.DB) {
 	}
 }
 
-//更新数据  waiting get attack table.
+//更新attack数据 get all_attack table. attack_name: node_attack  data_tampering
 func UpdateData(DB *sql.DB,who string) (int64){
 	//result,err := DB.Exec("UPDATE xx set password=? where id=?","111111",1)
 	//rowsaffected:=0
-	esql:=""
-	if who =="file" {
-		esql="UPDATE crack set number=number+1 where ackname=?"
+	esql:="UPDATE all_attack SET `count`=`count`+1 WHERE attack_name=?"
+	//if who =="file" {
+	if who =="node_attack" {
+		//esql="UPDATE all_attack SET 'count'='count'+1 WHERE attack_name=?"
 		result,err := DB.Exec(esql,who)
 		if err != nil{
-			fmt.Printf("Insert failed,err:%v\n", err)
+			//fmt.Printf("Insert failed,err:%v\n", err)
+			LogHander("Update all_attack failed,err:%v\n", err)
 			return -1
 		}
-		fmt.Println("update data successd:", result)
+		//fmt.Println("update data successd:", result)
+		InfoHander("update data all_attack successd. ")
 
 		rowsaffected,err := result.RowsAffected()
 		if err != nil {
-			fmt.Printf("Get RowsAffected failed,err:%v\n",err)
+			//fmt.Printf("Get RowsAffected failed,err:%v\n",err)
+			LogHander("Get RowsAffected failed,err:%v\n",err)
 			return -1
 		}
-		fmt.Println("Affected rows:", rowsaffected)
+		//fmt.Println("Affected rows:", rowsaffected)
+		InfoHander("Affected rows: "+string(rowsaffected))
 		return rowsaffected
 	}
-	if who == "sql"{
-		esql="UPDATE crack set number=number+1 where ackname=?"
+	//if who == "sql"{
+	if who == "data_tampering"{
+		//esql="UPDATE all_attack SET 'count'='count'+1 WHERE attack_name=?"
 		result,err := DB.Exec(esql,who)
 		if err != nil{
-			fmt.Printf("Insert failed,err:%v\n", err)
+			//fmt.Printf("Insert failed,err:%v\n", err)
+			LogHander("Update all_attack failed,err:%v\n", err)
 			return -1
 		}
-		fmt.Println("update data successd:", result)
+		//fmt.Println("update data successd:", result)
+		InfoHander("update data all_attack successd. ")
 
 		rowsaffected,err := result.RowsAffected()
 		if err != nil {
-			fmt.Printf("Get RowsAffected failed,err:%v\n",err)
+			//fmt.Printf("Get RowsAffected failed,err:%v\n",err)
+			LogHander("Get RowsAffected failed,err:%v\n",err)
 			return -1
 		}
-		fmt.Println("Affected rows:", rowsaffected)
+		//fmt.Println("Affected rows:", rowsaffected)
+		InfoHander("Affected rows: "+string(rowsaffected))
 		return rowsaffected
 	}
 	return -1
+}
+
+//更新数据 node_info  waiting get attack table. attack_name: node_attack  data_tampering
+func UpdateInfo (DB *sql.DB) (int64){
+	//result,err := DB.Exec("UPDATE xx set password=? where id=?","111111",1)
+	//rowsaffected:=0
+	//UPDATE node_info SET 'block_height'='block_height'+1
+	//UPDATE node_info SET 'attack_count'='attack_count'+1 WHERE ip='192.168.1.3'
+	asql:="UPDATE node_info SET `block_height`=`block_height`+1 "
+	csql:="UPDATE node_info SET `attack_count`=`attack_count`+1 WHERE ip=?"
+
+	aresult,aerr := DB.Exec(asql)
+	cresult,cerr := DB.Exec(csql,"192.168.1.3")
+	if aerr != nil && cerr!=nil{
+		//fmt.Printf("Insert failed,err:%v\n", err)
+		LogHander("Update node_info failed,err:%v\n", aerr)
+		LogHander("Update node_info failed,err:%v\n", cerr)
+		return -1
+	}
+	//fmt.Println("update data successd:", result)
+	InfoHander("update data node_info successd. ")
+
+	arowsaffected,aerr := aresult.RowsAffected()
+	crowsaffected,cerr := cresult.RowsAffected()
+	if aerr != nil && cerr!=nil {
+		//fmt.Printf("Get RowsAffected failed,err:%v\n",err)
+		LogHander("Get RowsAffected failed,err:%v\n",aerr)
+		LogHander("Get RowsAffected failed,err:%v\n",cerr)
+		return -1
+	}
+	//fmt.Println("Affected rows:", rowsaffected)
+	InfoHander("Affected rows: "+string(arowsaffected))
+	InfoHander("Affected rows: "+string(crowsaffected))
+	return 1
 }
 
 //删除数据
@@ -204,35 +327,6 @@ func DeleteData(DB *sql.DB){
 }
 
 //有返回值  两个表即不一样 "crshow","crshow1",返回被修改的行数
-func CompareData(DB *sql.DB, tb1 string,tb2 string) (int64){
-	//querysql:="SELECT * FROM " +
-	//	"(SELECT *  FROM ? UNION ALL SELECT * FROM ?) tbl " +
-	//	"GROUP BY showstring,`status`, ca,`createtime` " +
-	//	"HAVING COUNT(*) = 1"
-	querysql:="SELECT * FROM (SELECT * FROM ? UNION ALL SELECT * FROM ?) tbl GROUP BY showstring,`status`, ca,`createtime` HAVING COUNT(*) = 1"
-	InfoHander(querysql)
-	result,err := DB.Exec(querysql,tb1,tb2)
-	//result,err := DB.Query(querysql,tb1,tb2)
-
-	if err == nil{
-		//fmt.Printf("CompareData failed,err:%v\n",err)
-		LogHander("CompareData failed,err:%v\n",err)
-		return -1
-	}
-	fmt.Println("compare data successd:", result)
-	InfoHander("compare data successd. ")
-
-	rowsaffected,err := result.RowsAffected()
-	if err == nil {
-		//fmt.Printf("Get RowsAffected failed,err:%v\n",err)
-		LogHander("Get RowsAffected failed,err:%v\n",err)
-		return -1
-	}
-	//fmt.Println("Affected rows:", rowsaffected)
-	InfoHander("Affected rows: "+string(rowsaffected))
-	return rowsaffected
-}
-
 func CompareTables(DB *sql.DB, tb1 string,tb2 string) (int) {
 	//cs:=new(Crshow)
 	var cs Crshow
@@ -246,7 +340,7 @@ func CompareTables(DB *sql.DB, tb1 string,tb2 string) (int) {
 		(SELECT *  FROM ` +tb1+` UNION ALL SELECT * FROM `+tb2+ `) tbl
 		GROUP BY showstring,status,ca,createtime
 		HAVING COUNT(*) = 1`
-	InfoHander(querysql)
+	//InfoHander(querysql)
 	//querysql := "SELECT *  FROM ?"
 
 	//rows,err:=DB.Query(querysql,tb1,tb2)

@@ -8,7 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-const tbSource = "crshow1"
+const tbSource = "xcr_source"
 const tbDist = "crshow"
 const fmd="cd20059c676a1f35d4a34f897b736430"
 
@@ -21,7 +21,9 @@ const (
 	NETWORK = "tcp"
 	SERVER = "192.168.1.193"
 	PORT = 3306
-	DATABASE = "redmine"
+	//DATABASE = "redmine"
+	DATABASE = "attack_defense_info"
+	AlertDB = "attack_defense_info"
 )
 
 var DB *sql.DB
@@ -48,11 +50,20 @@ func rsql(){
 	}
 	defer DB.Close()
 
+	//connalert := fmt.Sprintf("%s:%s@%s(%s:%d)/%s",USERNAME, PASSWORD, NETWORK, SERVER, PORT, AlertDB)
+	//DBalert, err := sql.Open("mysql", connalert)
+	//if err != nil {
+	//	fmt.Println("connection to mysql failed:", err)
+	//	lib.LogHander("connection to mysql failed:", err)
+	//	return
+	//}
+	//defer DBalert.Close()
+
 	srows:=lib.CompareTables(DB,tbSource,tbDist)
 	fmt.Println(".........................db compare finished! is "+ string(srows))
 	if srows !=0{
-		//update attack number
-		upAttack:=lib.UpdateData(DB,"sql")
+		//update attack number attack_name: file=node_attack  sql=data_tampering
+		upAttack:=lib.UpdateData(DB,"data_tampering")
 		if upAttack==-1{
 			lib.InfoHander("update attack number err! is -1")
 			fmt.Println(".........................update attack number err!!")
@@ -60,11 +71,51 @@ func rsql(){
 		lib.InfoHander("update attack number +1! is "+string(upAttack))
 		fmt.Println(".........................update attack number +1! is "+string(upAttack))
 
+		//update node_info
+		//return 1 is sucessful.
+		upNodeInfo:=lib.UpdateInfo(DB)
+		if upNodeInfo!=1{
+			lib.InfoHander("update node_info number err! is -1")
+			fmt.Println(".........................update node_info err!!")
+		}
+		lib.InfoHander("update node_info +1! is "+string(upNodeInfo))
+		fmt.Println(".........................update node_info +1! is "+string(upNodeInfo))
+
+
+		//add attack_info
+		//at_type is 2 or 3 , attack_name: 2 = node_attack;  3 = data_tampering
+		//return 1 is sucessful.
+		addInfo:=lib.InsertInfo(DB,"hacker",3)
+		if addInfo==-1{
+			lib.InfoHander("add attack_info err! is -1")
+			fmt.Println(".........................add attack_info err!!")
+		}
+		lib.InfoHander("add attack_info is "+string(addInfo))
+		fmt.Println(".........................add attack_info is "+string(addInfo))
+
+
+		//add attack_log
+		//at_type is 2 or 3 , attack_name: 2 = node_attack;  3 = data_tampering
+		//return 1 is sucessful.
+		addLog:=lib.InsertLog(DB,3)
+		if addLog==-1{
+			lib.InfoHander("add attack_log is err!")
+			fmt.Println(".........................add attack_log is err!")
+		}
+		lib.InfoHander("add attack_info is "+string(addLog))
+		fmt.Println(".........................add attack_info is "+string(addLog))
+
+
 		//restore the table data
 		resTable:=lib.RestoreData(DB,tbSource,tbDist)
+		if resTable!=1{
+			lib.InfoHander("restore db table err!")
+			fmt.Println(".........................restore db table err!!")
+		}
 		fmt.Println(".........................db restore finished! is "+string(resTable))
-	}
 
+		defer DB.Close()
+	}
 }
 
 func rfiles(){
@@ -93,7 +144,8 @@ func rfiles(){
 			return
 		}
 
-		upAttack:=lib.UpdateData(DB,"file")
+		//update attack number attack_name: file=node_attack  sql=data_tampering
+		upAttack:=lib.UpdateData(DB,"node_attack")
 		if upAttack==-1{
 			lib.InfoHander("update attack number err! is -1")
 			fmt.Println(".........................update attack number err!!")
@@ -101,6 +153,41 @@ func rfiles(){
 		lib.InfoHander("update attack file number +1! is "+string(upAttack))
 		fmt.Println(".........................update attack number +1! is "+string(upAttack))
 		defer DB.Close()
+
+		//update node_info
+		//return 1 is sucessful.
+		upNodeInfo:=lib.UpdateInfo(DB)
+		if upNodeInfo!=1{
+			lib.InfoHander("update node_info number err! is -1")
+			fmt.Println(".........................update node_info err!!")
+		}
+		lib.InfoHander("update node_info +1! is "+string(upNodeInfo))
+		fmt.Println(".........................update node_info +1! is "+string(upNodeInfo))
+
+
+		//add attack_info
+		//at_type is 2 or 3 , attack_name: 2 = node_attack;  3 = data_tampering
+		//return 1 is sucessful.
+		addInfo:=lib.InsertInfo(DB,"hacker",2)
+		if addInfo==-1{
+			lib.InfoHander("add attack_info err! is -1")
+			fmt.Println(".........................add attack_info err!!")
+		}
+		lib.InfoHander("add attack_info is "+string(addInfo))
+		fmt.Println(".........................add attack_info is "+string(addInfo))
+
+
+		//add attack_log
+		//at_type is 2 or 3 , attack_name: 2 = node_attack;  3 = data_tampering
+		//return 1 is sucessful.
+		addLog:=lib.InsertLog(DB,2)
+		if addLog==-1{
+			lib.InfoHander("add attack_log is err!")
+			fmt.Println(".........................add attack_log is err!")
+		}
+		lib.InfoHander("add attack_info is "+string(addLog))
+		fmt.Println(".........................add attack_info is "+string(addLog))
+
 
 		//exec restrofile to destetion
 		cpStr:=lib.CmdBash("cp -av "+dirSource+"/* "+dirDist)
@@ -135,8 +222,8 @@ func showmd5(){
 
 
 func showssql(){
-	tb1:="crshow"
-	tb2:="crshow1"
+	//tb1:="crshow"
+	//tb2:="crshow1"
 	conn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s",USERNAME, PASSWORD, NETWORK, SERVER, PORT, DATABASE)
 	DB, err := sql.Open("mysql", conn)
 	if err != nil {
@@ -147,7 +234,7 @@ func showssql(){
 	defer DB.Close()
 
 	//srows := lib.CompareData(DB,table1,table2)
-	srows := lib.CompareTables(DB,tb1,tb2)
+	srows := lib.CompareTables(DB,tbSource,tbDist)
 	//lib.TableOne(DB,tb1)
 
 	//lib.QueryOne(DB)
