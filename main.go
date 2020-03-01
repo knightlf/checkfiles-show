@@ -13,13 +13,13 @@ const tbDist = "crshow"
 const fmd="cd20059c676a1f35d4a34f897b736430"
 
 const dirSource="./source"
-const dirDist="./destin"
+const dirDist="/chongren"
 
 const (
 	USERNAME = "8lab"
 	PASSWORD = "8lab"
 	NETWORK = "tcp"
-	SERVER = "192.168.1.193"
+	SERVER = "172.21.0.25"
 	PORT = 3306
 	//DATABASE = "redmine"
 	DATABASE = "attack_defense_info"
