@@ -22,5 +22,7 @@ file:
 
 ------------------------
 run in server:
+
 root@k8s-s3:/data/crshow# ./checkfiles rsql >>/data/logs/crshow/log-$(date +\%Y-\%m-\%d).log &
+
 root@k8s-s3:/data/crshow# ./checkfiles rfile >>/data/logs/crshow/log-$(date +\%Y-\%m-\%d).log &
