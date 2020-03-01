@@ -8,11 +8,16 @@ check something for chongren show
 ------------------------
 protection resource
 sql: 
+
     use crshow;
+    
     mysql> update crshow set ca='aaaaaaaaaaaaaaaaa';
+    
 
 file:
+
     /chongren/test1
+    
     /chongren/test2
 
 ------------------------
