@@ -13,6 +13,9 @@ const tbSource = "xcr_source"
 const tbDist = "crshow"
 const fmd="cd20059c676a1f35d4a34f897b736430"
 
+const DING_TOKEN = "dd84405981561e0f67af319ece4059f8d06fa56eb5f79d298443765c3024c95f"
+const DING_SECRET = "SEC3b6b33bb310bfcaf200d99fc47ef72030437287435bdaf1741531433da21fb67"
+
 const dirSource="./source"
 const dirDist="/chongren"
 
@@ -20,7 +23,8 @@ const (
 	USERNAME = "8lab"
 	PASSWORD = "8lab"
 	NETWORK = "tcp"
-	SERVER = "172.21.0.25"
+	SERVER = "192.168.1.193"
+	//SERVER = "172.21.0.25"
 	PORT = 3306
 	//DATABASE = "redmine"
 	DATABASE = "attack_defense_info"
@@ -116,6 +120,20 @@ func rsql(){
 		fmt.Println(".........................db restore finished! is "+string(resTable))
 
 		defer DB.Close()
+
+		//send dingding
+		msg:="崇仁存证节点受到数据篡改攻击，系统已阻断。"
+
+		var sendd=lib.DingTalk{}
+		sendd.AccessToken=DING_TOKEN
+		sendd.Secret=DING_SECRET
+		dresult,err:=sendd.SendDingMsg(msg)
+		if err!=nil{
+			lib.LogHander("send dinging faild: ",err)
+			fmt.Println(".........................send dinging faild!")
+		}
+		fmt.Println(".........................send dinging success! http code "+string(dresult.ErrCode))
+
 	}
 }
 
@@ -201,6 +219,21 @@ func rfiles(){
 		}
 		lib.LogHander("exec faild: get dirDist md5 error ", derr)
 		fmt.Println("dirDist: " + fmd + "==" + "dirDist: " + destinmd5)
+
+
+		msg:="崇仁验证节点受到数据篡改攻击，系统已阻断。"
+		var sendd=lib.DingTalk{}
+		sendd.AccessToken=DING_TOKEN
+		sendd.Secret=DING_SECRET
+		dresult,err:=sendd.SendDingMsg(msg)
+		if err!=nil{
+			lib.LogHander("send dinging faild: ",err)
+			fmt.Println(".........................send dinging faild!")
+		}
+		fmt.Println(".........................send dinging success! http code "+string(dresult.ErrCode))
+
+
+
 	}
 	fmt.Println("dirDist: "+fmd+"=="+"dirDist: "+destinmd5)
 }
