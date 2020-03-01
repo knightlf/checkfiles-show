@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 const tbSource = "xcr_source"
@@ -135,6 +136,7 @@ func rfiles(){
 	//if sourcemd5==destinmd5{
 	if string(sourcemd5)==string(destinmd5) {
 		lib.InfoHander("the file md5 exec has equal. ")
+		fmt.Println(".........................the file md5 exec has equal.")
 	} else {
 		//update attack number
 		conn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s", USERNAME, PASSWORD, NETWORK, SERVER, PORT, DATABASE)
@@ -261,14 +263,22 @@ func main(){
 	}
 	if len(os.Args)==2{
 		if string(os.Args[1])=="rsql"{
-			rsql()
-			fmt.Println("arg:", string(os.Args[1]))
-			//fmt.Println("upgrade mysql table restore.")
+			for {
+				time.Sleep(3 * time.Second)
+				rsql()
+				fmt.Println("arg:", string(os.Args[1]))
+				//fmt.Println("upgrade mysql table restore.")
+			}
+
 		}
 		if string(os.Args[1])=="rfile"{
-			rfiles()
-			fmt.Println("arg:", string(os.Args[1]))
-			fmt.Println("upgrade show files restore.")
+			for {
+				time.Sleep(3 * time.Second)
+				rfiles()
+				fmt.Println("arg:", string(os.Args[1]))
+				fmt.Println("upgrade show files restore.")
+			}
+
 		}
 		if string(os.Args[1])=="smd5"{
 			showmd5()
