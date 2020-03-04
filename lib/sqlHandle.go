@@ -272,6 +272,27 @@ func UpdateData(DB *sql.DB,who string) (int64){
 		InfoHander("Affected rows: "+string(rowsaffected))
 		return rowsaffected
 	}
+	if who == "hacker"{
+		esql="update crshow set ca='aaaaaaaaaaa';"
+		result,err := DB.Exec(esql)
+		if err != nil{
+			//fmt.Printf("Insert failed,err:%v\n", err)
+			LogHander("Hacker databases crshow failed,err:%v\n", err)
+			return -1
+		}
+		//fmt.Println("update data successd:", result)
+		InfoHander("Hacker databases crshow successd. ")
+
+		rowsaffected,err := result.RowsAffected()
+		if err != nil {
+			//fmt.Printf("Get RowsAffected failed,err:%v\n",err)
+			LogHander("Get Hacker databases RowsAffected failed,err:%v\n",err)
+			return -1
+		}
+		//fmt.Println("Affected rows:", rowsaffected)
+		InfoHander("Hacker databases Affected rows: "+string(rowsaffected))
+		return rowsaffected
+	}
 	return -1
 }
 

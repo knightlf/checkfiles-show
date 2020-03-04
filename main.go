@@ -289,6 +289,28 @@ func showssql(){
 
 }
 
+func hackersql(){
+	//tb1:="crshow"
+	//tb2:="crshow1"
+	conn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s",USERNAME, PASSWORD, NETWORK, SERVER, PORT, DATABASE)
+	DB, err := sql.Open("mysql", conn)
+	if err != nil {
+		fmt.Println("connection to mysql failed:", err)
+		lib.LogHander("connection to mysql failed:", err)
+		return
+	}
+	defer DB.Close()
+
+	upNodeInfo := lib.UpdateData(DB,"hacker")
+	if upNodeInfo == -1 {
+		lib.InfoHander("hacker sql number err! is -1")
+		fmt.Println(".........................hacker sql number err!!")
+	}
+	lib.InfoHander("hacker sql number success! is " + string(upNodeInfo))
+	fmt.Println(".........................hacker sql number success! is " + string(upNodeInfo))
+
+}
+
 
 func main(){
 	if len(os.Args)!=2{
@@ -324,6 +346,12 @@ func main(){
 		if string(os.Args[1])=="ssql"{
 			//showsql()
 			showssql()
+			fmt.Println("arg:", string(os.Args[1]))
+			//fmt.Println("show sql type to ssql.")
+		}
+		if string(os.Args[1])=="hsql"{
+			//showsql()
+			hackersql()
 			fmt.Println("arg:", string(os.Args[1]))
 			//fmt.Println("show sql type to ssql.")
 		}

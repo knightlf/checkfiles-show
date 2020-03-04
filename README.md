@@ -7,19 +7,26 @@ check something for chongren show
 
 ------------------------
 protection resource
-sql: 
+sql example:: 
 
     use crshow;
     
     mysql> update crshow set ca='aaaaaaaaaaaaaaaaa';
     
+    Shortcut::
+        ./checkfiles hsql
+    
 
-file:
+file example::
 
     /chongren/test1
     
     /chongren/test2
 
+    Shortcut:
+      ceho 'aaaa' >> /chongren/test1
+    
+    
 ------------------------
 run in server:
 
