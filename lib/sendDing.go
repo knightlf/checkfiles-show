@@ -28,7 +28,8 @@ type Response struct {
 	ErrCode int64  `json:"errcode"`
 }
 
-const httpTimoutSecond = time.Duration(30) * time.Second
+//use var to set timeout counts
+//const httpTimoutSecond = time.Duration(30) * time.Second
 // https://oapi.dingtalk.com/robot/send?access_token=xxx
 const dingTalkOAPI = "oapi.dingtalk.com"
 
@@ -75,7 +76,7 @@ func sign(timestamp string, secret string) (string, error) {
 }
 
 
-func (d *DingTalk) SendDingMsg(msg string) (Response, error) {
+func (d *DingTalk) SendDingMsg(msg string,dtime int) (Response, error) {
 	//请求地址模板
 	//safe tag: SEC3b6b33bb310bfcaf200d99fc47ef72030437287435bdaf1741531433da21fb67
 
@@ -98,7 +99,8 @@ func (d *DingTalk) SendDingMsg(msg string) (Response, error) {
 	req.Header.Add("Content-Type", "application/json")
 
 	client := new(http.Client)
-	client.Timeout = httpTimoutSecond
+	//client.Timeout = httpTimoutSecond
+	client.Timeout =time.Duration(dtime) * time.Second
 	resp, err := client.Do(req)
 	if err != nil {
 		LogHander("set http client err: ",err)

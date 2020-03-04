@@ -127,7 +127,8 @@ func rsql(){
 		var sendd=lib.DingTalk{}
 		sendd.AccessToken=DING_TOKEN
 		sendd.Secret=DING_SECRET
-		dresult,err:=sendd.SendDingMsg(msg)
+		//defaults timeout is 30
+		dresult,err:=sendd.SendDingMsg(msg,30)
 		if err!=nil{
 			lib.LogHander("send dinging faild: ",err)
 			fmt.Println(".........................send dinging faild!")
@@ -225,14 +226,13 @@ func rfiles(){
 		var sendd=lib.DingTalk{}
 		sendd.AccessToken=DING_TOKEN
 		sendd.Secret=DING_SECRET
-		dresult,err:=sendd.SendDingMsg(msg)
+		//defaults timeout is 30
+		dresult,err:=sendd.SendDingMsg(msg,30)
 		if err!=nil{
 			lib.LogHander("send dinging faild: ",err)
 			fmt.Println(".........................send dinging faild!")
 		}
 		fmt.Println(".........................send dinging success! http code "+string(dresult.ErrCode))
-
-
 
 	}
 	fmt.Println("dirDist: "+fmd+"=="+"dirDist: "+destinmd5)
