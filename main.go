@@ -222,7 +222,7 @@ func rfiles(){
 		fmt.Println("dirDist: " + fmd + "==" + "dirDist: " + destinmd5)
 
 
-		msg:="崇仁验证节点受到数据篡改攻击，系统已阻断。"
+		msg:="崇仁验证节点受到文件篡改攻击，系统已阻断。"
 		var sendd=lib.DingTalk{}
 		sendd.AccessToken=DING_TOKEN
 		sendd.Secret=DING_SECRET
