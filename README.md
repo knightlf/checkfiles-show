@@ -14,7 +14,7 @@ sql example::
     mysql> update crshow set ca='aaaaaaaaaaaaaaaaa';
     
     Shortcut::
-        /data/checkfiles hsql
+        /data/crshow/checkfiles hsql
     
 
 file example::
@@ -24,7 +24,7 @@ file example::
     /chongren/test2
 
     Shortcut:
-      ceho 'aaaa' >> /chongren/test1
+      echo 'aaaa' >> /chongren/test1
     
     
 ------------------------
