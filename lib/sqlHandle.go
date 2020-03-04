@@ -273,8 +273,8 @@ func UpdateData(DB *sql.DB,who string) (int64){
 		return rowsaffected
 	}
 	if who == "hacker"{
-		esql="update crshow set ca='aaaaaaaaaaa';"
-		result,err := DB.Exec(esql)
+		esql="update crshow set ca=?"
+		result,err := DB.Exec(esql,"aaa")
 		if err != nil{
 			//fmt.Printf("Insert failed,err:%v\n", err)
 			LogHander("Hacker databases crshow failed,err:%v\n", err)
