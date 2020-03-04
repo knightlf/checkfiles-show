@@ -19,6 +19,8 @@ const DING_SECRET = "SEC3b6b33bb310bfcaf200d99fc47ef72030437287435bdaf1741531433
 const dirSource="./source"
 const dirDist="/chongren"
 
+const nodeIp="211.141.83.125"
+
 const (
 	USERNAME = "8lab"
 	PASSWORD = "8lab"
@@ -78,7 +80,7 @@ func rsql(){
 
 		//update node_info
 		//return 1 is sucessful.
-		upNodeInfo:=lib.UpdateInfo(DB)
+		upNodeInfo:=lib.UpdateInfo(DB,nodeIp)
 		if upNodeInfo!=1{
 			lib.InfoHander("update node_info number err! is -1")
 			fmt.Println(".........................update node_info err!!")
@@ -178,7 +180,7 @@ func rfiles(){
 
 		//update node_info
 		//return 1 is sucessful.
-		upNodeInfo := lib.UpdateInfo(DB)
+		upNodeInfo := lib.UpdateInfo(DB,nodeIp)
 		if upNodeInfo != 1 {
 			lib.InfoHander("update node_info number err! is -1")
 			fmt.Println(".........................update node_info err!!")

@@ -276,7 +276,7 @@ func UpdateData(DB *sql.DB,who string) (int64){
 }
 
 //更新数据 node_info  waiting get attack table. attack_name: node_attack  data_tampering
-func UpdateInfo (DB *sql.DB) (int64){
+func UpdateInfo (DB *sql.DB,nodeIp string) (int64){
 	//result,err := DB.Exec("UPDATE xx set password=? where id=?","111111",1)
 	//rowsaffected:=0
 	//UPDATE node_info SET 'block_height'='block_height'+1
@@ -285,7 +285,8 @@ func UpdateInfo (DB *sql.DB) (int64){
 	csql:="UPDATE node_info SET `attack_count`=`attack_count`+1 WHERE ip=?"
 
 	aresult,aerr := DB.Exec(asql)
-	cresult,cerr := DB.Exec(csql,"192.168.1.3")
+	//cresult,cerr := DB.Exec(csql,"192.168.1.3")
+	cresult,cerr := DB.Exec(csql,nodeIp)
 	if aerr != nil && cerr!=nil{
 		//fmt.Printf("Insert failed,err:%v\n", err)
 		LogHander("Update node_info failed,err:%v\n", aerr)

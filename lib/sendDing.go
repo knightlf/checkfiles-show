@@ -39,14 +39,16 @@ var dingTalkURL url.URL = url.URL{
 	Path:   "robot/send",
 }
 
-var timestamp = strconv.FormatInt(time.Now().Unix()*1000, 10)
+//change to args  tmInt
+//var timestamp = strconv.FormatInt(time.Now().Unix()*1000, 10)
 
 // GetDingTalkURL get DingTalk URL with accessToken & secret
 // If no signature is set, the secret is set to ""
 // 如果没有加签，secret 设置为 "" 即可
-func GetDingTalkURL(accessToken string, secret string) (string, error) {
+func GetDingTalkURL(accessToken string, secret string,tmInt int) (string, error) {
 	dtu := dingTalkURL
 	value := url.Values{}
+	timestamp := strconv.FormatInt(time.Now().Unix()*1000, tmInt)
 	value.Set("access_token", accessToken)
 
 	if secret == "" {
@@ -81,7 +83,7 @@ func (d *DingTalk) SendDingMsg(msg string,dtime int) (Response, error) {
 	//safe tag: SEC3b6b33bb310bfcaf200d99fc47ef72030437287435bdaf1741531433da21fb67
 
 	res := Response{}
-	pushURL, err := GetDingTalkURL(d.AccessToken, d.Secret)
+	pushURL, err := GetDingTalkURL(d.AccessToken, d.Secret, dtime)
 	if err != nil {
 		LogHander("get ding sign err: ",err)
 		return res, err
