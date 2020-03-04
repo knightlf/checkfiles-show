@@ -230,7 +230,7 @@ func rfiles(){
 		sendd.AccessToken=DING_TOKEN
 		sendd.Secret=DING_SECRET
 		//defaults timeout is 30
-		dresult,err:=sendd.SendDingMsg(msg,30)
+		dresult,err:=sendd.SendDingMsg(msg,dtime)
 		if err!=nil{
 			lib.LogHander("send dinging faild: ",err)
 			fmt.Println(".........................send dinging faild!")
