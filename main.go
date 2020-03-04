@@ -12,6 +12,7 @@ import (
 const tbSource = "xcr_source"
 const tbDist = "crshow"
 const fmd="cd20059c676a1f35d4a34f897b736430"
+const dtime=10
 
 const DING_TOKEN = "dd84405981561e0f67af319ece4059f8d06fa56eb5f79d298443765c3024c95f"
 const DING_SECRET = "SEC3b6b33bb310bfcaf200d99fc47ef72030437287435bdaf1741531433da21fb67"
@@ -130,7 +131,7 @@ func rsql(){
 		sendd.AccessToken=DING_TOKEN
 		sendd.Secret=DING_SECRET
 		//defaults timeout is 30
-		dresult,err:=sendd.SendDingMsg(msg,30)
+		dresult,err:=sendd.SendDingMsg(msg,dtime)
 		if err!=nil{
 			lib.LogHander("send dinging faild: ",err)
 			fmt.Println(".........................send dinging faild!")
