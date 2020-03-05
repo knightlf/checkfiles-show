@@ -214,6 +214,8 @@ func rfiles(){
 		//exec restrofile to destetion
 		cpStr := lib.CmdBash("cp -av " + dirSource + "/* " + dirDist)
 		lib.InfoHander("exec cp: " + cpStr)
+		rmStr := lib.CmdBash("rm -rf " + dirDist + "/* ")
+		lib.InfoHander("exec rm: " + rmStr)
 		//fmt.Println(err.Error())
 		destinmd5, derr := lib.GetFileName(dirDist)
 		if derr != nil {
