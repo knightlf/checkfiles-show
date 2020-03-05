@@ -302,31 +302,41 @@ func UpdateInfo (DB *sql.DB,nodeIp string) (int64){
 	//rowsaffected:=0
 	//UPDATE node_info SET 'block_height'='block_height'+1
 	//UPDATE node_info SET 'attack_count'='attack_count'+1 WHERE ip='192.168.1.3'
-	asql:="UPDATE node_info SET `block_height`=`block_height`+1 "
+	//asql:="UPDATE node_info SET `block_height`=`block_height`+1 "
 	csql:="UPDATE node_info SET `attack_count`=`attack_count`+1 WHERE ip=?"
 
-	aresult,aerr := DB.Exec(asql)
+	//aresult,aerr := DB.Exec(asql)
 	//cresult,cerr := DB.Exec(csql,"192.168.1.3")
 	cresult,cerr := DB.Exec(csql,nodeIp)
-	if aerr != nil && cerr!=nil{
+	//if aerr != nil && cerr!=nil{
+	//	//fmt.Printf("Insert failed,err:%v\n", err)
+	//	LogHander("Update node_info failed,err:%v\n", aerr)
+	//	LogHander("Update node_info failed,err:%v\n", cerr)
+	//	return -1
+	//}
+	if cerr!=nil{
 		//fmt.Printf("Insert failed,err:%v\n", err)
-		LogHander("Update node_info failed,err:%v\n", aerr)
 		LogHander("Update node_info failed,err:%v\n", cerr)
 		return -1
 	}
 	//fmt.Println("update data successd:", result)
 	InfoHander("update data node_info successd. ")
 
-	arowsaffected,aerr := aresult.RowsAffected()
+	//arowsaffected,aerr := aresult.RowsAffected()
 	crowsaffected,cerr := cresult.RowsAffected()
-	if aerr != nil && cerr!=nil {
+	//if aerr != nil && cerr!=nil {
+	//	//fmt.Printf("Get RowsAffected failed,err:%v\n",err)
+	//	LogHander("Get RowsAffected failed,err:%v\n",aerr)
+	//	LogHander("Get RowsAffected failed,err:%v\n",cerr)
+	//	return -1
+	//}
+	if cerr!=nil {
 		//fmt.Printf("Get RowsAffected failed,err:%v\n",err)
-		LogHander("Get RowsAffected failed,err:%v\n",aerr)
 		LogHander("Get RowsAffected failed,err:%v\n",cerr)
 		return -1
 	}
 	//fmt.Println("Affected rows:", rowsaffected)
-	InfoHander("Affected rows: "+string(arowsaffected))
+	//InfoHander("Affected rows: "+string(arowsaffected))
 	InfoHander("Affected rows: "+string(crowsaffected))
 	return 1
 }
