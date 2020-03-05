@@ -26,8 +26,8 @@ const (
 	USERNAME = "8lab"
 	PASSWORD = "8lab"
 	NETWORK = "tcp"
-	//SERVER = "192.168.1.193"
-	SERVER = "172.21.0.25"
+	SERVER = "192.168.1.193"
+	//SERVER = "172.21.0.25"
 	PORT = 3306
 	//DATABASE = "redmine"
 	DATABASE = "attack_defense_info"
