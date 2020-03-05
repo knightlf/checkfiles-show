@@ -131,7 +131,8 @@ func rsql(){
 		sendd.AccessToken=DING_TOKEN
 		sendd.Secret=DING_SECRET
 		//defaults timeout is 30
-		dresult,err:=sendd.SendDingMsg(msg,dtime)
+		dt:=10
+		dresult,err:=sendd.SendDingMsg(msg,dt)
 		if err!=nil{
 			lib.LogHander("send dinging faild: ",err)
 			fmt.Println(".........................send dinging faild!")
@@ -212,10 +213,11 @@ func rfiles(){
 		fmt.Println(".........................add attack_info is " + string(addLog))
 
 		//exec restrofile to destetion
-		cpStr := lib.CmdBash("cp -av " + dirSource + "/* " + dirDist)
-		lib.InfoHander("exec cp: " + cpStr)
 		rmStr := lib.CmdBash("rm -rf " + dirDist + "/* ")
 		lib.InfoHander("exec rm: " + rmStr)
+		cpStr := lib.CmdBash("cp -av " + dirSource + "/* " + dirDist)
+		lib.InfoHander("exec cp: " + cpStr)
+
 		//fmt.Println(err.Error())
 		destinmd5, derr := lib.GetFileName(dirDist)
 		if derr != nil {
@@ -232,7 +234,8 @@ func rfiles(){
 		sendd.AccessToken=DING_TOKEN
 		sendd.Secret=DING_SECRET
 		//defaults timeout is 30
-		dresult,err:=sendd.SendDingMsg(msg,dtime)
+		dt:=10
+		dresult,err:=sendd.SendDingMsg(msg,dt)
 		if err!=nil{
 			lib.LogHander("send dinging faild: ",err)
 			fmt.Println(".........................send dinging faild!")
