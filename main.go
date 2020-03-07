@@ -19,7 +19,7 @@ const DING_SECRET = "SEC3b6b33bb310bfcaf200d99fc47ef72030437287435bdaf1741531433
 
 const dirSource="./source"
 const dirDist="/chongren"
-
+const chongrenPro="http://49.233.191.60:8792/protect"
 const nodeIp="211.141.83.125"
 
 const (
@@ -126,7 +126,14 @@ func rsql(){
 		defer DB.Close()
 
 		//send dingding
-		msg:="崇仁存证节点受到数据篡改攻击，系统已阻断。"
+		//msg:="崇仁存证节点受到数据篡改攻击，系统已阻断。"
+		alertime:=time.Now().Format("2006-01-02 15:04:05")
+		msg:="报警时间： " + alertime +"\n"+
+			"异常事件：存证节点遭受数据篡改 \n"+
+			"攻击来源：外部 \n"+
+			"遭篡改数据：崇仁存证节点 \n" +
+			"处理方式：系统已记录该账号操作过程，系统已阻断攻击并将数据恢复 \n"+
+			"请及时登录安全防护系统进行确认，查看详情："+chongrenPro
 
 		var sendd=lib.DingTalk{}
 		sendd.AccessToken=DING_TOKEN
@@ -230,7 +237,15 @@ func rfiles(){
 		fmt.Println("dirDist: " + fmd + "==" + "dirDist: " + destinmd5)
 
 
-		msg:="崇仁验证节点受到文件篡改攻击，系统已阻断。"
+		//msg:="崇仁验证节点受到文件篡改攻击，系统已阻断。"
+		alertime:=time.Now().Format("2006-01-02 15:04:05")
+		msg:="报警时间： " + alertime +"\n"+
+			"异常事件：验证节点遭受数据攻击 \n"+
+			"攻击来源：外部 \n"+
+			"遭篡改数据：崇仁验证节点 \n" +
+			"处理方式：系统已记录该账号操作过程，系统已阻断攻击并将数据恢复 \n"+
+			"请及时登录安全防护系统进行确认，查看详情："+chongrenPro
+
 		var sendd=lib.DingTalk{}
 		sendd.AccessToken=DING_TOKEN
 		sendd.Secret=DING_SECRET
